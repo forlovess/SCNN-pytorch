@@ -26,7 +26,7 @@ class Trainer(object):
         self.train_loader, self.val_loader, self.test_loader, self.nclass = make_data_loader(args, **kwargs)
 
         # Define network
-        model = SCNN(nclass=self.nclass,backbone=args.backbone,output_stride=args.out_stride)
+        model = SCNN(nclass=self.nclass,backbone=args.backbone,output_stride=args.out_stride,cuda = args.cuda)
 
         # Define Optimizer
         optimizer = torch.optim.SGD(model.parameters(),args.lr, momentum=args.momentum,
