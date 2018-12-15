@@ -4,15 +4,18 @@ import torch.nn.functional as F
 from modeling.backbone import build_backbone
 from modeling.build_rnn import build_rnn
 class SCNN(nn.Module):
-    def __init__(self, backbone='resnet', output_stride=16,nclass = 19):
+    def __init__(self, backbone='resnet', output_stride=16,nclass = 19,cuda= True):
         super(SCNN, self).__init__()
         if backbone == 'drn':
             output_stride = 8
 
         BatchNorm = nn.BatchNorm2d
-
+        if cuda == True:
+            device = "cuda"
+        else:
+            device = "cpu"
         self.backbone = build_backbone(backbone, output_stride, BatchNorm)
-        self.rnn = build_rnn(32)
+        self.rnn = build_rnn(32,device)
         self.conv0 = nn.Sequential(nn.Conv2d(320, 32, 3, padding=1, bias=False),
                                    BatchNorm(32),
                                     nn.ReLU())
