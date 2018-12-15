@@ -1,7 +1,8 @@
 # pytorch-SCNN
 
-**Update on 2018/12/15. 
- ###TODO
+**Update on 2018/12/15.
+
+ ### TODO
 - [x] Support different backbones
 - [x] Support Cityscapes 
 - [x] Single-GPU training
