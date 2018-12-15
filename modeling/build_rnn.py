@@ -3,8 +3,9 @@ import torch.nn as nn
 import numpy as np
 
 class build_rnn(nn.Module):
-    def __init__(self, in_dim):
-        super(build_rnn, self).__init__()
+    def __init__(self, in_dim,device):
+        super(SCNN, self).__init__()
+        self.device = device
         #nn.Conv2d = [in_channels, out_channels, kernel_size, stride, padding]
         self.conv1 = nn.Conv2d(1,1,kernel_size=(1,9),padding=(0,4))
         # torch.nn.functional.pad()
@@ -17,16 +18,16 @@ class build_rnn(nn.Module):
         feature_list_old = []
         feature_list_new = []
         for cnt in range(x.size()[1]):
-            feature_list_old.append(np.expand_dims(x[:, cnt, :, :].detach().numpy(), axis=1))
+            feature_list_old.append(np.expand_dims(x[:, cnt, :, :].cpu().detach().numpy(), axis=1))
 
-        feature_list_new.append(np.expand_dims(x[:, 0, :, :].detach().numpy(), axis=1))
-
-        top_2_down = self.relu(self.conv1(torch.from_numpy(feature_list_old[0])))
-        top_2_down = torch.add(top_2_down,torch.from_numpy(feature_list_old[0]))
+        feature_list_new.append(np.expand_dims(x[:, 0, :, :].cpu().detach().numpy(), axis=1))
+        top_2_down = self.conv1(torch.from_numpy(feature_list_old[0]).float().to(self.device))
+        top_2_down = self.relu(top_2_down)
+        top_2_down = torch.add(top_2_down,torch.from_numpy(feature_list_old[0]).float().to(self.device))
         feature_list_new.append(top_2_down)
         for cnt in range(2, x.size()[1]):
             top_2_down = self.relu(self.conv1(feature_list_new[cnt-1]))
-            top_2_down = torch.add(torch.from_numpy(feature_list_old[cnt]), top_2_down)
+            top_2_down = torch.add(torch.from_numpy(feature_list_old[cnt]).float().to(self.device), top_2_down)
             feature_list_new.append(top_2_down)
 
         # down to top #
@@ -49,7 +50,7 @@ class build_rnn(nn.Module):
             try:
                 down_2_top = torch.add(feature_list_old[feature_len - cnt],down_2_top)
             except:
-                down_2_top = torch.add(torch.from_numpy(feature_list_old[feature_len - cnt]), down_2_top)
+                down_2_top = torch.add(torch.from_numpy(feature_list_old[feature_len - cnt]).float().to(self.device), down_2_top)
             feature_list_new.append(down_2_top)
 
         feature_list_new.reverse()
@@ -60,17 +61,17 @@ class build_rnn(nn.Module):
         feature_list_old = []
         feature_list_new = []
         for cnt in range(processed_feature.size()[2]):
-            feature_list_old.append(np.expand_dims(processed_feature[:, :, cnt, :].detach().numpy(), axis=2))
-        feature_list_new.append(np.expand_dims(processed_feature[:, :, 0, :].detach().numpy(), axis=2))
+            feature_list_old.append(np.expand_dims(processed_feature[:, :, cnt, :].cpu().detach().numpy(), axis=2))
+        feature_list_new.append(np.expand_dims(processed_feature[:, :, 0, :].cpu().detach().numpy(), axis=2))
 
-        left_2_right = torch.add(self.relu(self.conv2(torch.from_numpy(feature_list_old[0]))),
-                                 torch.from_numpy(feature_list_old[1]))
+        left_2_right = torch.add(self.relu(self.conv2(torch.from_numpy(feature_list_old[0]).float().to(self.device))),
+                                 torch.from_numpy(feature_list_old[1]).float().to(self.device))
         feature_list_new.append(left_2_right)
         # print()processed_feature.size()[2]
         for cnt in range(2, processed_feature.size()[2]):
             # with tf.variable_scope("convs_6_3", reuse=True):
             left_2_right = torch.add(self.relu(self.conv2(feature_list_new[cnt - 1])),
-                                     torch.from_numpy(feature_list_old[cnt]))
+                                     torch.from_numpy(feature_list_old[cnt]).float().to(self.device))
             feature_list_new.append(left_2_right)
         # right to left #
 
@@ -96,7 +97,7 @@ class build_rnn(nn.Module):
                                  feature_list_old[feature_list_old_len - cnt])
             except:
                 conv_6_4 = torch.add(self.relu(self.conv2(feature_list_new[cnt - 1])),
-                                     torch.from_numpy(feature_list_old[feature_list_old_len - cnt]))
+                                     torch.from_numpy(feature_list_old[feature_list_old_len - cnt]).float().to(self.device))
             feature_list_new.append(conv_6_4)
 
         feature_list_new.reverse()
