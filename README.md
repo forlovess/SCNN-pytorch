@@ -52,6 +52,6 @@ Fellow steps below to train your model:
 
     ```
 
-###Acknowledgement
+### Acknowledgement
 This repo is built upon [SCNN](https://github.com/XingangPan/SCNN) and [LaneNet](https://github.com/MaybeShewill-CV/lanenet-lane-detection)
 and [pytorch-deeplab-xception](https://github.com/jfzhang95/pytorch-deeplab-xception).
