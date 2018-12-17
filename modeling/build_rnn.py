@@ -4,7 +4,7 @@ import numpy as np
 
 class build_rnn(nn.Module):
     def __init__(self, in_dim,device):
-        super(SCNN, self).__init__()
+        super(build_rnn, self).__init__()
         self.device = device
         #nn.Conv2d = [in_channels, out_channels, kernel_size, stride, padding]
         self.conv1 = nn.Conv2d(1,1,kernel_size=(1,9),padding=(0,4))
