@@ -13,6 +13,7 @@
 This is a PyTorch(0.4.1) implementation of [Spatial CNN ](https://arxiv.org/abs/1712.06080). It
 can use Modified Aligned  ResNet as backbone. Currently, we train SCNN
 using Cityscapes datasets.
+![Spatial CNN](doc/model.PNG)
 ![Results](doc/results.png)
 
 
